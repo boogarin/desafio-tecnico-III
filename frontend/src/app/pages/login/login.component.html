@@ -1,0 +1,49 @@
+<div class="login-container" @fadeIn>
+  <div class="login-card" @slideIn>
+    <div class="login-header">
+      <h1>MobileMed</h1>
+      <p>Gerenciamento de Exames</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Digite seu usuário"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Digite sua senha"
+          class="form-input"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-button"
+      >
+        <span>Entrar</span>
+      </button>
+    </form>
+
+    <div class="demo-credentials">
+      <p><strong>Credenciais de Teste:</strong></p>
+      <p>Usuário: <code>admin</code></p>
+      <p>Senha: <code>admin</code></p>
+    </div>
+  </div>
+</div>

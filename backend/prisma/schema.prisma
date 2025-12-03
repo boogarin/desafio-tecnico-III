@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Modalidade {
+  CR
+  CT
+  DX
+  MG
+  MR
+  NM
+  OT
+  PT
+  RF
+  US
+  XA
+}
+
+model Paciente {
+  id                String      @id @default(uuid())
+  nome              String      @db.VarChar(255)
+  cpf               String      @unique @db.VarChar(11)
+  dataNascimento    DateTime    @db.Date
+  sexo              String      @db.VarChar(1)
+  endereco          String      @db.VarChar(500)
+  telefone          String      @db.VarChar(20)
+  criadoEm          DateTime    @default(now())
+  atualizadoEm      DateTime    @updatedAt
+  
+  exames            Exame[]
+
+  @@map("pacientes")
+}
+
+model Exame {
+  id                String      @id @default(uuid())
+  modalidade        Modalidade
+  data              DateTime    @db.Date
+  resultado         String      @db.Text
+  idempotencyKey    String      @unique @db.VarChar(255)
+  pacienteId        String
+  criadoEm          DateTime    @default(now())
+  atualizadoEm      DateTime    @updatedAt
+
+  paciente          Paciente    @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  @@index([pacienteId])
+  @@index([idempotencyKey])
+  @@map("exames")
+}

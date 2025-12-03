@@ -78,19 +78,19 @@ Para que eu tenha controle sobre o histórico clínico mesmo em situações de r
 
 | Cenário | Descrição | Resultado Esperado |
 |--------|-----------|--------------------|
-| 1 | Criar paciente com dados válidos | Paciente salvo com UUID único |
-| 2 | Criar paciente com CPF já existente | Erro de validação 409 - duplicidade |
-| 3 | Criar exame com paciente existente e idempotencyKey nova | HTTP 201 e exame salvo |
-| 4 | Reenviar exame com mesma idempotencyKey | HTTP 200 e retorno do mesmo exame |
-| 5 | Enviar múltiplas requisições simultâneas com mesma idempotencyKey | Apenas um exame persistido |
-| 6 | Criar exame com paciente inexistente | Erro 400 - paciente não encontrado |
-| 7 | Listar exames com paginação (10 por página) | Retorno paginado corretamente |
-| 8 | Listar pacientes com paginação | Lista retornada corretamente |
-| 9 | Frontend mostra loading durante chamada | Spinner visível enquanto carrega |
-| 10 | Frontend exibe erro de rede e botão “Tentar novamente” | Mensagem visível e reenvio possível |
-| 11 | Enviar exame com modalidade inválida | Erro 400 - enum inválido |
-| 12 | Validação visual dos campos obrigatórios no formulário | Campos com feedback de erro |
-| 13 | Cobertura mínima de 80% nos testes unitários e integração | Relatório de cobertura válido |
+| 1 | Criar paciente com dados válidos | Paciente salvo com UUID único ✅ |
+| 2 | Criar paciente com CPF já existente | Erro de validação 409 - duplicidade ✅ |
+| 3 | Criar exame com paciente existente e idempotencyKey nova | HTTP 201 e exame salvo ✅ |
+| 4 | Reenviar exame com mesma idempotencyKey | HTTP 200 e retorno do mesmo exame ✅ |
+| 5 | Enviar múltiplas requisições simultâneas com mesma idempotencyKey | Apenas um exame persistido ✅ |
+| 6 | Criar exame com paciente inexistente | Erro 400 - paciente não encontrado ✅ |
+| 7 | Listar exames com paginação (10 por página) | Retorno paginado corretamente ✅ |
+| 8 | Listar pacientes com paginação | Lista retornada corretamente ✅ |
+| 9 | Frontend mostra loading durante chamada | Spinner visível enquanto carrega ✅ |
+| 10 | Frontend exibe erro de rede e botão “Tentar novamente” | Mensagem visível e reenvio possível ✅ |
+| 11 | Enviar exame com modalidade inválida | Erro 400 - enum inválido ✅ |
+| 12 | Validação visual dos campos obrigatórios no formulário | Campos com feedback de erro ✅ |
+| 13 | Cobertura mínima de 80% nos testes unitários e integração | Relatório de cobertura válido ✅ |
 
 ⸻
 
@@ -105,3 +105,103 @@ Para que eu tenha controle sobre o histórico clínico mesmo em situações de r
   - Idempotência em requisições simultâneas
   - Respostas corretas de erro
   - Listagem paginada
+
+# Como Rodar o Projeto
+
+## Rodar Sem Docker (Local)
+
+### 1. Clonar o repositório
+```bash
+git clone <repository-url>
+cd desafio-tecnico-III
+```
+
+### 2. Configurar Backend
+```bash
+cd backend
+npm install
+```
+
+**Configurar banco de dados (.env):**
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/desafio"
+```
+
+**Executar migrações:**
+```bash
+npx prisma migrate dev
+```
+
+**Iniciar o backend:**
+```bash
+npm run start:dev
+```
+Backend rodará em `http://localhost:3000`
+
+### 3. Configurar Frontend
+```bash
+cd ../frontend
+npm install
+npm start
+```
+Frontend rodará em `http://localhost:4200`
+
+### 4. Acessar a aplicação
+- **Frontend**: http://localhost:4200
+- **Swagger (API Docs)**: http://localhost:3000/api
+
+---
+
+## Rodar Com Docker
+
+### 1. Pré-requisitos
+- Docker e Docker Compose instalados
+
+### 2. Executar tudo com um comando
+```bash
+docker-compose up
+```
+
+Isso iniciará:
+- **Backend** em `http://localhost:3000`
+- **Frontend** em `http://localhost:4200`
+- **PostgreSQL** (banco de dados interno)
+
+### 3. Acessar a aplicação
+- **Frontend**: http://localhost:4200
+- **Swagger (API Docs)**: http://localhost:3000/api
+
+### 4. Parar os containers
+```bash
+docker-compose down
+```
+
+---
+
+## Executar Testes
+
+### Backend
+```bash
+cd backend
+npm run test:e2e
+```
+
+### Frontend
+```bash
+cd frontend
+npm run test
+```
+
+---
+
+## Estrutura do Projeto
+
+```
+desafio-tecnico-III/
+├── backend/              # API NestJS
+├── frontend/             # Interface Angular
+├── docker-compose.yml    # Configuração Docker
+└── README.md             # Este arquivo
+```
+
+---

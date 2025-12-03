@@ -1,0 +1,10 @@
+{
+  "/api": {
+    "target": "http://desafio-api:3000",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "changeOrigin": true
+  }
+}

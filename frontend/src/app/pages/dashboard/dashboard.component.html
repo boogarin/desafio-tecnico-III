@@ -1,0 +1,251 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <img src="https://mobilemed.com.br/wp-content/uploads/2023/10/2023-RGB-mobilemed-logotipo_mobilemed-logotipo-horizontal-branco@2x-1.png" alt="MobileMed" class="logo">
+      <button class="logout-button" (click)="logout()">
+        <span class="material-icons">logout</span>
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div *ngIf="successMessage" class="success-message">
+      ✓ {{ successMessage }}
+    </div>
+
+    <div class="tabs-container">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'pacientes'"
+        (click)="switchTab('pacientes')"
+      >
+        <span class="material-icons">people</span>
+        Pacientes
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'exames'"
+        (click)="switchTab('exames')"
+      >
+        <span class="material-icons">biotech</span>
+        Exames
+      </button>
+    </div>
+
+    <!-- TAB: PACIENTES -->
+    <div *ngIf="activeTab === 'pacientes'" class="tab-content">
+      <div class="content-header">
+        <h2>Pacientes</h2>
+        <button
+          class="add-button"
+          (click)="openNewPacienteForm()"
+        >
+          <span class="material-icons">add</span>
+          Novo Paciente
+        </button>
+      </div>
+
+      <div *ngIf="showPacienteForm" class="form-container">
+        <form [formGroup]="pacienteForm" (ngSubmit)="createPaciente()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" formControlName="nome" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>CPF</label>
+              <input type="text" formControlName="cpf" class="form-input" placeholder="11 dígitos" />
+              <div class="error-message" *ngIf="pacienteForm.get('cpf')?.invalid && pacienteForm.get('cpf')?.touched" style="color: red; margin-top: 4px;">
+                CPF inválido. Certifique-se de que possui 11 dígitos.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Data de Nascimento</label>
+              <input type="date" formControlName="dataNascimento" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Sexo</label>
+              <select formControlName="sexo" class="form-input">
+                <option value="">Selecione</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Endereço</label>
+              <input type="text" formControlName="endereco" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Telefone</label>
+              <input type="tel" formControlName="telefone" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="submit-button" [disabled]="isLoading || pacienteForm.invalid">
+              {{ editingPacienteId === null ? 'Criar Paciente' : 'Atualizar Paciente' }}
+            </button>
+            <button type="button" class="cancel-button" (click)="cancelEditPaciente()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">⏳ Carregando...</div>
+
+      <div class="table-container" *ngIf="!isLoading && pacientes.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><span class="material-icons">person</span> Nome</th>
+              <th><span class="material-icons">badge</span> CPF</th>
+              <th><span class="material-icons">cake</span> Data Nascimento</th>
+              <th><span class="material-icons">wc</span> Sexo</th>
+              <th><span class="material-icons">phone</span> Telefone</th>
+              <th class="actions-column"><span class="material-icons">settings</span> Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let paciente of pacientes" class="table-row">
+              <td>{{ paciente.nome }}</td>
+              <td>{{ paciente.cpf }}</td>
+              <td>{{ paciente.dataNascimento | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ paciente.sexo === 'M' ? 'Masculino' : 'Feminino' }}</td>
+              <td>{{ paciente.telefone }}</td>
+              <td class="actions-column">
+                <button class="action-button edit-button" (click)="editPaciente(paciente)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="action-button delete-button" (click)="deletePaciente(paciente.id)" title="Deletar">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && pacientes.length === 0">
+        📭 Nenhum paciente encontrado
+      </div>
+    </div>
+
+    <!-- TAB: EXAMES -->
+    <div *ngIf="activeTab === 'exames'" class="tab-content">
+      <div class="content-header">
+        <h2>Exames</h2>
+        <button
+          class="add-button"
+          (click)="showExameForm = !showExameForm"
+        >
+          <span class="material-icons">add</span>
+          Novo Exame
+        </button>
+      </div>
+
+      <div *ngIf="showExameForm" class="form-container">
+        <form [formGroup]="exameForm" (ngSubmit)="createExame()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Modalidade (Tipo de Exame)</label>
+              <select formControlName="modalidade" class="form-input">
+                <option value="">Selecione</option>
+                <option value="CR">CR - Radiografia Computadorizada</option>
+                <option value="CT">CT - Tomografia Computadorizada</option>
+                <option value="DX">DX - Radiografia Digital</option>
+                <option value="MG">MG - Mamografia</option>
+                <option value="MR">MR - Ressonância Magnética</option>
+                <option value="NM">NM - Medicina Nuclear</option>
+                <option value="PT">PT - PET</option>
+                <option value="US">US - Ultrassom</option>
+                <option value="OT">OT - Outro</option>
+                <option value="RF">RF - Fluoroscopia</option>
+                <option value="XA">XA - Angiografia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Data do Exame</label>
+              <input type="date" formControlName="data" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Paciente</label>
+              <select formControlName="pacienteId" class="form-input">
+                <option value="">Selecione um paciente</option>
+                <option *ngFor="let p of pacientes" [value]="p.id">{{ p.nome }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Resultado</label>
+              <select formControlName="resultado" class="form-input">
+                <option value="">Selecione</option>
+                <option value="Normal">Normal</option>
+                <option value="Alterado">Alterado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="submit-button" [disabled]="isLoading || exameForm.invalid">
+              {{ editingExameId ? 'Atualizar' : 'Criar' }} Exame
+            </button>
+            <button type="button" class="cancel-button" (click)="cancelEditExame()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">⏳ Carregando...</div>
+
+      <div class="table-container" *ngIf="!isLoading && exames.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><span class="material-icons">medical_services</span> Modalidade</th>
+              <th><span class="material-icons">event</span> Data</th>
+              <th><span class="material-icons">assignment_turned_in</span> Resultado</th>
+              <th><span class="material-icons">schedule</span> Criado em</th>
+              <th class="actions-column"><span class="material-icons">settings</span> Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let exame of exames" class="table-row">
+              <td><span class="badge">{{ exame.modalidade }}</span></td>
+              <td>{{ exame.data | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <span [class]="'result-' + exame.resultado.toLowerCase()">
+                  {{ exame.resultado }}
+                </span>
+              </td>
+              <td>{{ exame.criadoEm | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td class="actions-column">
+                <button class="action-button edit-button" (click)="editExame(exame)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="action-button delete-button" (click)="deleteExame(exame.id)" title="Deletar">
+                  <span class="material-icons">delete</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && exames.length === 0">
+        📭 Nenhum exame encontrado
+      </div>
+    </div>
+  </main>
+</div>
